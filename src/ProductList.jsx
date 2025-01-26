@@ -15,6 +15,10 @@ function ProductList() {
         return cartItems.reduce((total, item) => total + item.quantity, 0);
     };
 
+    const isAddedToCart = (productName) => {
+        return cartItems.some((item) => item.name === productName);
+    };
+
     const handleAddToCart = (product) => {
         dispatch(addItem(product));
         setAddedToCart((prevState) => ({
@@ -291,7 +295,6 @@ const handlePlantsClick = (e) => {
                                 <circle cx="184" cy="216" r="12"></circle>
                                 <path d="M42.3,72H221.7l-26.4,92.4A15.9,15.9,0,0,1,179.9,176H84.1a15.9,15.9,0,0,1-15.4-11.6L32.5,37.8A8,8,0,0,0,24.8,32H8" fill="none" stroke="#faf9f9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" id="mainIconPathAttribute"></path>
                             </svg>
-                            {/* Muestra la cantidad total en el carrito */}
                             <span className="cart_quantity_count">{calculateTotalQuantity()}</span>
                         </h1>
                     </a>
@@ -303,15 +306,26 @@ const handlePlantsClick = (e) => {
             <div className="product-grid">
                 {plantsArray.map((category, index) => (
                     <div key={index}>
-                        <h1><div>{category.category}</div></h1>
+                        <h1>{category.category}</h1>
                         <div className="product-list">
                             {category.plants.map((plant, plantIndex) => (
                                 <div className="product-card" key={plantIndex}>
-                                    <img className="product-image" src={plant.image} alt={plant.name} />
+                                    <img
+                                        className="product-image"
+                                        src={plant.image}
+                                        alt={plant.name}
+                                    />
                                     <div className="product-title">{plant.name}</div>
                                     <p className="product-price">{plant.cost}</p>
                                     <p className="product-description">{plant.description}</p>
-                                    <button className="product-button" onClick={() => handleAddToCart(plant)}>Add to Cart</button>
+                                    <button
+                                        className={`product-button ${isAddedToCart(plant.name) ? 'added-to-cart' : ''}`}
+                                        onClick={() => !isAddedToCart(plant.name) && handleAddToCart(plant)}
+                                        disabled={isAddedToCart(plant.name)}
+                                    >
+                                        {isAddedToCart(plant.name) ? 'Added to Cart' : 'Add to Cart'}
+                                    </button>
+
                                 </div>
                             ))}
                         </div>
@@ -319,10 +333,11 @@ const handlePlantsClick = (e) => {
                 ))}
             </div>
         ) : (
-            <CartItem onContinueShopping={handleContinueShopping} />
+            <CartItem onContinueShopping={() => setShowCart(false)} />
         )}
     </div>
 );
+
 }
 
 export default ProductList;
